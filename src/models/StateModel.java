@@ -17,12 +17,9 @@ public class StateModel {
   }
 
   public ArrayList<State> getAll() {
-    Statement stmt;
     ArrayList<State> stateList = new ArrayList<State>();
 
-    try {
-      stmt = dbConnection.createStatement();
-
+    try (Statement stmt = dbConnection.createStatement()) {
       ResultSet rs = stmt.executeQuery("SELECT * FROM states");
       while (rs.next()) {
         stateList.add(new State(
@@ -38,15 +35,29 @@ public class StateModel {
     return stateList;
   }
 
-  public void create(String name) {
-    Statement stmt;
-    String sqlInsert = "INSERT INTO states(name) VALUES(?)";
-    try {
-      stmt = dbConnection.createStatement();
-      PreparedStatement pStmt = dbConnection.prepareStatement(sqlInsert);
+  public State getByName(String name) {
+    State state = null;
 
-      pStmt.setString(1, name);
-      pStmt.executeUpdate();
+    String sqlSelect = "SELECT * FROM states WHERE name = ?";
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlSelect)) {
+      stmt.setString(1, name);
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        state = new State(rs.getInt("id"), rs.getString("name"));
+      }
+      stmt.close();
+    } catch (Exception e) {
+      System.out.println("Error con SQLite: " + e.getMessage());
+    }
+
+    return state;
+  }
+
+  public void create(String name) {
+    String sqlInsert = "INSERT INTO states(name) VALUES(?)";
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlInsert)) {
+      stmt.setString(1, name);
+      stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
       System.out.println("Error con SQLite: " + e.getMessage());
@@ -54,15 +65,11 @@ public class StateModel {
   }
 
   public void update(String prevName, String newName) {
-    Statement stmt;
     String sqlUpdate = "UPDATE states SET name = ? WHERE name = ?";
-    try {
-      stmt = dbConnection.createStatement();
-      PreparedStatement pStmt = dbConnection.prepareStatement(sqlUpdate);
-
-      pStmt.setString(1, newName);
-      pStmt.setString(2, prevName);
-      pStmt.executeUpdate();
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
+      stmt.setString(1, newName);
+      stmt.setString(2, prevName);
+      stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
       System.out.println("Error con SQLite: " + e.getMessage());
@@ -70,14 +77,10 @@ public class StateModel {
   }
 
   public void delete(String name) {
-    Statement stmt;
     String sqlDelete = "DELETE FROM states WHERE name = ?";
-    try {
-      stmt = dbConnection.createStatement();
-      PreparedStatement pStmt = dbConnection.prepareStatement(sqlDelete);
-
-      pStmt.setString(1, name);
-      pStmt.executeUpdate();
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
+      stmt.setString(1, name);
+      stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
       System.out.println("Error con SQLite: " + e.getMessage());

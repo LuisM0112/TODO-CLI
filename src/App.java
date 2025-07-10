@@ -4,17 +4,14 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import database.Database;
 import cli.Flag;
 import controllers.StateController;
-import database.Database;
+import controllers.TaskController;
 import models.StateModel;
+import models.TaskModel;
 
 public class App {
-
-  public static int takeArgs(int argsNum, String[] args) {
-    return 1;
-  }
-
   public static void main(String[] args) {
 
     args = new String[]{};
@@ -24,32 +21,51 @@ public class App {
     Map<String, Flag> flags = new HashMap<>();
 
     try (Connection dbConnection = DriverManager.getConnection(url)) {
-      
-      
+
       if (dbConnection == null) {
         return;
       }
-      
+
       Database.initialize(dbConnection);
-      
+
       StateModel stateModel = new StateModel(dbConnection);
-      
+      TaskModel taskModel = new TaskModel(dbConnection, stateModel);
+
       StateController stateController = new StateController(stateModel);
+      TaskController taskController = new TaskController(taskModel);
 
       if (args.length < 1) {
         stateController.getAll();
         return;
       }
 
-      flags.put("-n", new Flag(1, (a) -> {
-        stateController.create(a[0]);
+      // Task
+      flags.put("-n", new Flag(3, (a) -> {
+        taskController.create(a[0], a[1], a[2]);
       }));
 
-      flags.put("-u", new Flag(2, (a) -> {
-        stateController.update(a[0], a[1]);
+      flags.put("-u", new Flag(3, (a) -> {
+        taskController.update(a[0], a[1], a[2]);
+      }));
+
+      flags.put("-s", new Flag(2, (a) -> {
+        taskController.changeState(a[0], a[1]);
       }));
 
       flags.put("-d", new Flag(1, (a) -> {
+        taskController.delete(a[0]);
+      }));
+
+      // State
+      flags.put("-nState", new Flag(1, (a) -> {
+        stateController.create(a[0]);
+      }));
+
+      flags.put("-uState", new Flag(2, (a) -> {
+        stateController.update(a[0], a[1]);
+      }));
+
+      flags.put("-dState", new Flag(1, (a) -> {
         stateController.delete(a[0]);
       }));
 

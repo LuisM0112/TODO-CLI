@@ -17,7 +17,8 @@ public class Database {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         description TEXT,
-        state TEXT
+        state_id INTEGER NOT NULL,
+        FOREIGN KEY (state_id) REFERENCES states (id)
       );
     """;
 
