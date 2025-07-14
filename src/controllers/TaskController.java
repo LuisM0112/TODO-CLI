@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.ArrayList;
 
+import Helpers.Messages;
 import models.TaskModel;
 import models.definitions.Task;
 
@@ -28,7 +29,7 @@ public class TaskController {
 
   public void create(String description, String stateName) {
     this.taskModel.create(description, stateName);
-    System.out.println("Task added: " + description);
+    System.out.println(Messages.Task.created);
   }
 
   public void update(String taskId, String newDescription) {
@@ -36,18 +37,18 @@ public class TaskController {
       Integer.parseInt(taskId),
       newDescription
     );
-    System.out.println("Task updated: " + taskId + " to "+ newDescription);
+    System.out.println(Messages.Task.updated);
   }
   public void changeState(String taskId, String newStateName) {
     this.taskModel.changeState(
       Integer.parseInt(taskId),
       newStateName
     );
-    System.out.println("Task state updated to: " + newStateName);
+    System.out.println(Messages.Task.stateChanged);
   }
 
   public void delete(String taskId) {
     this.taskModel.delete(Integer.parseInt(taskId));
-    System.out.println("Task deleted: " + taskId);
+    System.out.println(Messages.Task.deleted);
   }
 }

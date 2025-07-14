@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import Helpers.Messages;
 import models.definitions.State;
 import models.definitions.Task;
 
@@ -62,7 +63,7 @@ public class TaskModel {
   public void create(String description, String stateName) {
     State state = stateModel.getByName(stateName);
     if (state == null) {
-      System.out.println("Task not found: " + stateName);
+      System.err.println(Messages.State.notFound);
       return;
     }
 
@@ -79,7 +80,7 @@ public class TaskModel {
 
   public void update(int taskId, String newDescription) {
     if (getById(taskId) == null) {
-      System.err.println("Task does not exist");
+      System.err.println(Messages.Task.notFound);
       return;
     }
     String sqlUpdate = "UPDATE tasks SET description = ? WHERE id = ?";
@@ -94,27 +95,32 @@ public class TaskModel {
   }
 
   public void changeState(int taskId, String newStateName) {
-    State newState = stateModel.getByName(newStateName);
-    if (newState == null) {
-      System.out.println("Task not found: " + newStateName);
+    if (getById(taskId) == null) {
+      System.err.println(Messages.Task.notFound);
       return;
     }
 
+    State newState = stateModel.getByName(newStateName);
+    if (newState == null) {
+      System.err.println(Messages.State.notFound);
+      return;
+    }
     String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE id = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
       stmt.setInt(1, newState.id);
       stmt.setInt(2, taskId);
-      int rowsAffected = stmt.executeUpdate();
+      stmt.executeUpdate();
       stmt.close();
-      if (rowsAffected == 0) {
-        System.out.println("Task not found: " + taskId);
-      }
     } catch (Exception e) {
       System.out.println("Change task state error: " + e.getMessage());
     }
   }
 
   public void delete(int taskId) {
+    if (getById(taskId) == null) {
+      System.err.println(Messages.Task.notFound);
+      return;
+    }
     String sqlDelete = "DELETE FROM tasks WHERE id = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
       stmt.setInt(1, taskId);

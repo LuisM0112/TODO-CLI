@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.ArrayList;
 
+import Helpers.Messages;
 import models.StateModel;
 import models.definitions.State;
 
@@ -23,17 +24,17 @@ public class StateController {
 
   public void create(String name) {
     this.stateModel.create(name);
-    System.out.println("State added: " + name);
+    System.out.println(Messages.State.created);
   }
 
   public void update(String prevName, String newName) {
     this.stateModel.update(prevName, newName);
-    System.out.println("State updated: " + prevName + " to "+ newName);
+    System.out.println(Messages.State.updated);
   }
 
   public void delete(String name) {
     this.stateModel.delete(name);
-    System.out.println("State deleted: " + name);
+    System.out.println(Messages.State.deleted);
   }
 
 }

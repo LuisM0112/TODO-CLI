@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import Helpers.Messages;
 import models.definitions.State;
 
 public class StateModel {
@@ -73,7 +74,7 @@ public class StateModel {
 
   public void create(String name) {
     if (getByName(name) != null) {
-      System.err.println("State already exist");
+      System.err.println(Messages.State.alreadyExists);
       return;
     }
     String sqlInsert = "INSERT INTO states(name) VALUES(?)";
@@ -88,7 +89,7 @@ public class StateModel {
 
   public void update(String prevName, String newName) {
     if (getByName(prevName) == null) {
-      System.err.println("State does not exist");
+      System.err.println(Messages.State.notFound);
       return;
     }
     String sqlUpdate = "UPDATE states SET name = ? WHERE name = ?";
@@ -104,7 +105,7 @@ public class StateModel {
 
   public void delete(String name) {
     if (getByName(name) == null) {
-      System.err.println("State does not exist");
+      System.err.println(Messages.State.notFound);
       return;
     }
     String sqlDelete = "DELETE FROM states WHERE name = ?";
