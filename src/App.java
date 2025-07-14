@@ -23,6 +23,7 @@ public class App {
     try (Connection dbConnection = DriverManager.getConnection(url)) {
 
       if (dbConnection == null) {
+        System.err.println("Failed to connect to the database");
         return;
       }
 
@@ -35,17 +36,21 @@ public class App {
       TaskController taskController = new TaskController(taskModel);
 
       if (args.length < 1) {
-        stateController.getAll();
+        taskController.getAll();
         return;
       }
 
       // Task
-      flags.put("-n", new Flag(3, (a) -> {
-        taskController.create(a[0], a[1], a[2]);
+      flags.put("-g", new Flag(1, (a) -> {
+        taskController.getById(a[0]);
       }));
 
-      flags.put("-u", new Flag(3, (a) -> {
-        taskController.update(a[0], a[1], a[2]);
+      flags.put("-n", new Flag(2, (a) -> {
+        taskController.create(a[0], a[1]);
+      }));
+
+      flags.put("-u", new Flag(2, (a) -> {
+        taskController.update(a[0], a[1]);
       }));
 
       flags.put("-s", new Flag(2, (a) -> {
@@ -57,6 +62,10 @@ public class App {
       }));
 
       // State
+      flags.put("-gState", new Flag(0, (_) -> {
+        stateController.getAll();
+      }));
+
       flags.put("-nState", new Flag(1, (a) -> {
         stateController.create(a[0]);
       }));

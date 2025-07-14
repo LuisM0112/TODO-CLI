@@ -25,82 +25,103 @@ public class TaskModel {
     try (Statement stmt = dbConnection.createStatement()) {
       ResultSet rs = stmt.executeQuery("SELECT * FROM tasks");
       while (rs.next()) {
+        State taskState = stateModel.getById(rs.getInt("state_id"));
         taskList.add(new Task(
           rs.getInt("id"),
-          rs.getString("name"),
           rs.getString("description"),
-          rs.getString("stateName")
+          taskState.name
         ));
       }
       stmt.close();
     } catch (Exception e) {
-      System.out.println("Error con SQLite: " + e.getMessage());
+      System.out.println("Get task list error: " + e.getMessage());
     }
 
     return taskList;
   }
 
-  public void create(String name, String description, String stateName) {
+  public Task getById(int taskId) {
+    Task task = null;
+
+    String sqlSelect = "SELECT * FROM tasks WHERE id = ?";
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlSelect)) {
+      stmt.setInt(1, taskId);
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        State taskState = stateModel.getById(rs.getInt("state_id"));
+        task = new Task(rs.getInt("id"), rs.getString("description"), taskState.name);
+      }
+      stmt.close();
+    } catch (Exception e) {
+      System.out.println("Get task error: " + e.getMessage());
+    }
+
+    return task;
+  }
+
+  public void create(String description, String stateName) {
     State state = stateModel.getByName(stateName);
     if (state == null) {
-      System.out.println("State not found: " + stateName);
+      System.out.println("Task not found: " + stateName);
       return;
     }
 
-    String sqlInsert = "INSERT INTO tasks(name, description, state_id) VALUES(?, ?, ?)";
+    String sqlInsert = "INSERT INTO tasks(description, state_id) VALUES(?, ?)";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlInsert)) {
-      stmt.setString(1, name);
-      stmt.setString(2, description);
-      stmt.setInt(3, state.id);
+      stmt.setString(1, description);
+      stmt.setInt(2, state.id);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
-      System.out.println("Error con SQLite: " + e.getMessage());
+      System.out.println("Create task error: " + e.getMessage());
     }
   }
 
-  public void update(String prevName, String newName, String newDescription) {
-    String sqlUpdate = "UPDATE tasks SET name = ?, description = ? WHERE name = ?";
+  public void update(int taskId, String newDescription) {
+    if (getById(taskId) == null) {
+      System.err.println("Task does not exist");
+      return;
+    }
+    String sqlUpdate = "UPDATE tasks SET description = ? WHERE id = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
-      stmt.setString(1, newName);
-      stmt.setString(2, newDescription);
-      stmt.setString(3, prevName);
+      stmt.setString(1, newDescription);
+      stmt.setInt(2, taskId);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
-      System.out.println("Error con SQLite: " + e.getMessage());
+      System.out.println("Update task error: " + e.getMessage());
     }
   }
 
-  public void changeState(String taskName, String newStateName) {
+  public void changeState(int taskId, String newStateName) {
     State newState = stateModel.getByName(newStateName);
     if (newState == null) {
-      System.out.println("State not found: " + newStateName);
+      System.out.println("Task not found: " + newStateName);
       return;
     }
 
-    String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE name = ?";
+    String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE id = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
       stmt.setInt(1, newState.id);
-      stmt.setString(2, taskName);
+      stmt.setInt(2, taskId);
       int rowsAffected = stmt.executeUpdate();
       stmt.close();
       if (rowsAffected == 0) {
-        System.out.println("Task not found: " + taskName);
+        System.out.println("Task not found: " + taskId);
       }
     } catch (Exception e) {
-      System.out.println("Error con SQLite: " + e.getMessage());
+      System.out.println("Change task state error: " + e.getMessage());
     }
   }
 
-  public void delete(String name) {
-    String sqlDelete = "DELETE FROM tasks WHERE name = ?";
+  public void delete(int taskId) {
+    String sqlDelete = "DELETE FROM tasks WHERE id = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
-      stmt.setString(1, name);
+      stmt.setInt(1, taskId);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
-      System.out.println("Error con SQLite: " + e.getMessage());
+      System.out.println("Delete task error: " + e.getMessage());
     }
   }
 }
