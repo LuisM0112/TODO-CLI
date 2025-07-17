@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import Helpers.Messages;
@@ -20,6 +22,13 @@ public class TaskModel {
     this.stateModel = stateModel;
   }
 
+  private String getDate(String dateRaw) {
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
+    LocalDateTime dateTime = LocalDateTime.parse(dateRaw);
+    String date = dateTime.format(dateFormat);
+    return date;
+  }
+
   public ArrayList<Task> getAll() {
     ArrayList<Task> taskList = new ArrayList<Task>();
 
@@ -27,10 +36,12 @@ public class TaskModel {
       ResultSet rs = stmt.executeQuery("SELECT * FROM tasks");
       while (rs.next()) {
         State taskState = stateModel.getById(rs.getInt("state_id"));
+        String dateRaw = rs.getString("creationDate");
         taskList.add(new Task(
           rs.getInt("id"),
           rs.getString("description"),
-          taskState.name
+          taskState.name,
+          getDate(dateRaw)
         ));
       }
       stmt.close();
@@ -50,7 +61,13 @@ public class TaskModel {
       ResultSet rs = stmt.executeQuery();
       if (rs.next()) {
         State taskState = stateModel.getById(rs.getInt("state_id"));
-        task = new Task(rs.getInt("id"), rs.getString("description"), taskState.name);
+        String dateRaw = rs.getString("creationDate");
+        task = new Task(
+          rs.getInt("id"),
+          rs.getString("description"),
+          taskState.name,
+          getDate(dateRaw)
+        );
       }
       stmt.close();
     } catch (Exception e) {
@@ -67,10 +84,13 @@ public class TaskModel {
       return;
     }
 
-    String sqlInsert = "INSERT INTO tasks(description, state_id) VALUES(?, ?)";
+    String date = LocalDateTime.now().toString();
+
+    String sqlInsert = "INSERT INTO tasks(description, creationDate, state_id) VALUES(?, ?, ?)";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlInsert)) {
       stmt.setString(1, description);
-      stmt.setInt(2, state.id);
+      stmt.setString(2, date);
+      stmt.setInt(3, state.id);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {

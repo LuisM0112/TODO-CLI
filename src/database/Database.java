@@ -18,6 +18,7 @@ public class Database {
       CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description TEXT,
+        creationDate TEXT,
         state_id INTEGER NOT NULL,
         FOREIGN KEY (state_id) REFERENCES states (id)
       );

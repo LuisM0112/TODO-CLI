@@ -18,7 +18,7 @@ public class TaskController {
     System.out.println("Task List");
     System.out.println("==========");
     for (Task task : taskList) {
-      System.out.println(task.id + ": " + task.description + ". " + task.state);
+      System.out.println(task.id +": "+ task.description +". "+ task.state +". "+ task.date);
     }
   }
 

@@ -62,19 +62,19 @@ public class App {
       }));
 
       // State
-      flags.put("-gState", new Flag(0, (_) -> {
+      flags.put("-gS", new Flag(0, (_) -> {
         stateController.getAll();
       }));
 
-      flags.put("-nState", new Flag(1, (a) -> {
+      flags.put("-nS", new Flag(1, (a) -> {
         stateController.create(a[0]);
       }));
 
-      flags.put("-uState", new Flag(2, (a) -> {
+      flags.put("-uS", new Flag(2, (a) -> {
         stateController.update(a[0], a[1]);
       }));
 
-      flags.put("-dState", new Flag(1, (a) -> {
+      flags.put("-dS", new Flag(1, (a) -> {
         stateController.delete(a[0]);
       }));
 
