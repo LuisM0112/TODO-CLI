@@ -18,13 +18,13 @@ public class TaskController {
     System.out.println("Task List");
     System.out.println("==========");
     for (Task task : taskList) {
-      System.out.println(task.id +": "+ task.description +". "+ task.state +". "+ task.date);
+      System.out.println("Nº "+ task.taskNumber +": "+ task.description +". "+ task.state);
     }
   }
 
-  public void getById(String taskId) {
-    Task task = this.taskModel.getById(Integer.parseInt(taskId));
-    System.out.println(task.id + ": " + task.description + ". " + task.state);
+  public void getByTaskNumber(String taskNumber) {
+    Task task = this.taskModel.getByTaskNumber(Integer.parseInt(taskNumber));
+    System.out.println("id: "+ task.id +"Nº "+ task.taskNumber + ": " + task.description + ". " + task.state +". "+ task.date);
   }
 
   public void create(String description, String stateName) {
@@ -50,5 +50,6 @@ public class TaskController {
   public void delete(String taskId) {
     this.taskModel.delete(Integer.parseInt(taskId));
     System.out.println(Messages.Task.deleted);
+    this.taskModel.updateTasksNumbers();
   }
 }

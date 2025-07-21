@@ -42,7 +42,7 @@ public class App {
 
       // Task
       flags.put("-g", new Flag(1, (a) -> {
-        taskController.getById(a[0]);
+        taskController.getByTaskNumber(a[0]);
       }));
 
       flags.put("-n", new Flag(2, (a) -> {

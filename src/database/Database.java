@@ -17,8 +17,9 @@ public class Database {
     String sqlCreateTasks = """
       CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_number INTEGER NOT NULL UNIQUE,
         description TEXT,
-        creationDate TEXT,
+        creation_date TEXT NOT NULL,
         state_id INTEGER NOT NULL,
         FOREIGN KEY (state_id) REFERENCES states (id)
       );

@@ -29,6 +29,47 @@ public class TaskModel {
     return date;
   }
 
+  private int getLastTaskNumber() {
+    int taskNumber = 0;
+
+    String sqlSelect = "SELECT MAX(task_number) AS task_number FROM tasks";
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlSelect)) {
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        taskNumber = rs.getInt("task_number");
+      }
+      stmt.close();
+    } catch (Exception e) {
+      System.out.println("Get task number error: " + e.getMessage());
+    }
+
+    return taskNumber;
+  }
+
+  private void updateTaskNumber(int taskId, int taskNumber) {
+    String sqlUpdate = "UPDATE tasks SET task_number = ? WHERE id = ?";
+    try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
+      stmt.setInt(1, taskNumber);
+      stmt.setInt(2, taskId);
+      stmt.executeUpdate();
+      stmt.close();
+    } catch (Exception e) {
+      System.out.println("Update task number error: " + e.getMessage());
+    }
+  }
+
+  public void updateTasksNumbers() {
+    ArrayList<Task> taskList = getAll();
+    for (int i = 0; i < taskList.size(); i++) {
+      Task task = taskList.get(i);
+      int expectedTaskNumber = i + 1;
+      if (task.taskNumber != expectedTaskNumber) {
+        task.taskNumber = expectedTaskNumber;
+        updateTaskNumber(task.id, task.taskNumber);
+      }
+    }
+  }
+
   public ArrayList<Task> getAll() {
     ArrayList<Task> taskList = new ArrayList<Task>();
 
@@ -36,9 +77,10 @@ public class TaskModel {
       ResultSet rs = stmt.executeQuery("SELECT * FROM tasks");
       while (rs.next()) {
         State taskState = stateModel.getById(rs.getInt("state_id"));
-        String dateRaw = rs.getString("creationDate");
+        String dateRaw = rs.getString("creation_date");
         taskList.add(new Task(
           rs.getInt("id"),
+          rs.getInt("task_number"),
           rs.getString("description"),
           taskState.name,
           getDate(dateRaw)
@@ -52,18 +94,19 @@ public class TaskModel {
     return taskList;
   }
 
-  public Task getById(int taskId) {
+  public Task getByTaskNumber(int taskNumber) {
     Task task = null;
 
-    String sqlSelect = "SELECT * FROM tasks WHERE id = ?";
+    String sqlSelect = "SELECT * FROM tasks WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlSelect)) {
-      stmt.setInt(1, taskId);
+      stmt.setInt(1, taskNumber);
       ResultSet rs = stmt.executeQuery();
       if (rs.next()) {
         State taskState = stateModel.getById(rs.getInt("state_id"));
-        String dateRaw = rs.getString("creationDate");
+        String dateRaw = rs.getString("creation_date");
         task = new Task(
           rs.getInt("id"),
+          rs.getInt("task_number"),
           rs.getString("description"),
           taskState.name,
           getDate(dateRaw)
@@ -84,13 +127,15 @@ public class TaskModel {
       return;
     }
 
+    int taskNumber = getLastTaskNumber() + 1;
     String date = LocalDateTime.now().toString();
 
-    String sqlInsert = "INSERT INTO tasks(description, creationDate, state_id) VALUES(?, ?, ?)";
+    String sqlInsert = "INSERT INTO tasks(task_number, description, creation_date, state_id) VALUES(?, ?, ?, ?)";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlInsert)) {
-      stmt.setString(1, description);
-      stmt.setString(2, date);
-      stmt.setInt(3, state.id);
+      stmt.setInt(1, taskNumber);
+      stmt.setString(2, description);
+      stmt.setString(3, date);
+      stmt.setInt(4, state.id);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
@@ -98,15 +143,15 @@ public class TaskModel {
     }
   }
 
-  public void update(int taskId, String newDescription) {
-    if (getById(taskId) == null) {
+  public void update(int taskNumber, String newDescription) {
+    if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
       return;
     }
-    String sqlUpdate = "UPDATE tasks SET description = ? WHERE id = ?";
+    String sqlUpdate = "UPDATE tasks SET description = ? WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
       stmt.setString(1, newDescription);
-      stmt.setInt(2, taskId);
+      stmt.setInt(2, taskNumber);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
@@ -114,8 +159,8 @@ public class TaskModel {
     }
   }
 
-  public void changeState(int taskId, String newStateName) {
-    if (getById(taskId) == null) {
+  public void changeState(int taskNumber, String newStateName) {
+    if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
       return;
     }
@@ -125,10 +170,10 @@ public class TaskModel {
       System.err.println(Messages.State.notFound);
       return;
     }
-    String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE id = ?";
+    String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
       stmt.setInt(1, newState.id);
-      stmt.setInt(2, taskId);
+      stmt.setInt(2, taskNumber);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
@@ -136,14 +181,14 @@ public class TaskModel {
     }
   }
 
-  public void delete(int taskId) {
-    if (getById(taskId) == null) {
+  public void delete(int taskNumber) {
+    if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
       return;
     }
-    String sqlDelete = "DELETE FROM tasks WHERE id = ?";
+    String sqlDelete = "DELETE FROM tasks WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
-      stmt.setInt(1, taskId);
+      stmt.setInt(1, taskNumber);
       stmt.executeUpdate();
       stmt.close();
     } catch (Exception e) {
