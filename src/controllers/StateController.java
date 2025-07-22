@@ -2,6 +2,7 @@ package controllers;
 
 import java.util.ArrayList;
 
+import Helpers.Printer;
 import Helpers.Messages;
 import models.StateModel;
 import models.definitions.State;
@@ -15,11 +16,12 @@ public class StateController {
 
   public void getAll() {
     ArrayList<State> stateList = this.stateModel.getAll();
-    System.out.println("State List");
-    System.out.println("==========");
-    for (State state : stateList) {
-      System.out.println(state.id + ": " + state.name);
-    }
+    Printer.printStatesTable(stateList);
+  }
+
+  public void getById(String stateId) {
+    State state = this.stateModel.getById(Integer.parseInt(stateId));
+    System.out.println(state.id + ": " + state.name);
   }
 
   public void create(String name) {

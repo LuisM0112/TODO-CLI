@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import Helpers.Printer;
 import database.Database;
 import cli.Flag;
 import controllers.StateController;
@@ -14,7 +15,7 @@ import models.TaskModel;
 public class App {
   public static void main(String[] args) {
 
-    args = new String[]{};
+    // args = new String[]{"-nS", "pending", "-n", "Testing task", "pending", "-l", "-lS"};
 
     String url = "jdbc:sqlite:TODO.db";
 
@@ -40,7 +41,15 @@ public class App {
         return;
       }
 
+      flags.put("-h", new Flag(0, (_) -> {
+        Printer.help();
+      }));
+
       // Task
+      flags.put("-l", new Flag(0, (_) -> {
+        taskController.getAll();;
+      }));
+
       flags.put("-g", new Flag(1, (a) -> {
         taskController.getByTaskNumber(a[0]);
       }));
@@ -62,8 +71,12 @@ public class App {
       }));
 
       // State
-      flags.put("-gS", new Flag(0, (_) -> {
+      flags.put("-lS", new Flag(0, (_) -> {
         stateController.getAll();
+      }));
+
+      flags.put("-gS", new Flag(1, (a) -> {
+        stateController.getById(a[0]);
       }));
 
       flags.put("-nS", new Flag(1, (a) -> {
