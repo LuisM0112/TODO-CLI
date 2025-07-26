@@ -15,20 +15,18 @@ import models.TaskModel;
 public class App {
   public static void main(String[] args) {
 
-    // args = new String[]{"-nS", "pending", "-n", "Testing task", "pending", "-l", "-lS"};
+    // args = new String[]{"--init", "-n", "Testing task", "default", "-l", "-lS"};
 
-    String url = "jdbc:sqlite:TODO.db";
+    String dbUrl = "jdbc:sqlite:TODO.db";
 
     Map<String, Flag> flags = new HashMap<>();
 
-    try (Connection dbConnection = DriverManager.getConnection(url)) {
+    try (Connection dbConnection = DriverManager.getConnection(dbUrl)) {
 
       if (dbConnection == null) {
         System.err.println("Failed to connect to the database");
         return;
       }
-
-      Database.initialize(dbConnection);
 
       StateModel stateModel = new StateModel(dbConnection);
       TaskModel taskModel = new TaskModel(dbConnection, stateModel);
@@ -40,6 +38,10 @@ public class App {
         taskController.getAll();
         return;
       }
+
+      flags.put("--init", new Flag(0, (_) -> {
+        Database.initialize(dbConnection);
+      }));
 
       flags.put("-h", new Flag(0, (_) -> {
         Printer.help();
@@ -98,6 +100,7 @@ public class App {
 
         if (flag == null) {
           System.err.println("Unknown flag: " + flagString);
+          System.out.println("See help: -h");
           return;
         }
 

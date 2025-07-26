@@ -25,10 +25,13 @@ public class Database {
       );
     """;
 
+    String sqlAddDefaultState = "INSERT INTO states(name) VALUES(\"default\");";
+
     try {
       stmt = conn.createStatement();
       stmt.execute(sqlCreateStates);
       stmt.execute(sqlCreateTasks);
+      stmt.executeUpdate(sqlAddDefaultState);
       stmt.close();
     } catch (SQLException e) {
       System.out.println("Error con SQLite: " + e.getMessage());

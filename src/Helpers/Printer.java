@@ -51,6 +51,7 @@ public class Printer {
   public static void help(){
     String text = """
     ---------------------------------------------------
+      Initialize database: --init
       Help: -h
     ---------------------------------------------------
       List tasks: -l
