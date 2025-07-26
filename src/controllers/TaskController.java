@@ -2,8 +2,8 @@ package controllers;
 
 import java.util.ArrayList;
 
-import Helpers.Printer;
-import Helpers.Messages;
+import helpers.Messages;
+import helpers.Printer;
 import models.TaskModel;
 import models.definitions.Task;
 
@@ -25,27 +25,39 @@ public class TaskController {
   }
 
   public void create(String description, String stateName) {
-    this.taskModel.create(description, stateName);
+    int resultTaskNumber = this.taskModel.create(description, stateName);
+    if (resultTaskNumber == 0) {
+      return;
+    }
     System.out.println(Messages.Task.created);
   }
 
   public void update(String taskNumber, String newDescription) {
-    this.taskModel.update(
+    int resultTaskNumber = this.taskModel.update(
       Integer.parseInt(taskNumber),
       newDescription
     );
+    if (resultTaskNumber == 0) {
+      return;
+    }
     System.out.println(Messages.Task.updated);
   }
   public void changeState(String taskNumber, String newStateName) {
-    this.taskModel.changeState(
+    int resultTaskNumber = this.taskModel.changeState(
       Integer.parseInt(taskNumber),
       newStateName
     );
+    if (resultTaskNumber == 0) {
+      return;
+    }
     System.out.println(Messages.Task.stateChanged);
   }
 
   public void delete(String taskNumber) {
-    this.taskModel.delete(Integer.parseInt(taskNumber));
+    int resultTaskNumber = this.taskModel.delete(Integer.parseInt(taskNumber));
+    if (resultTaskNumber == 0) {
+      return;
+    }
     System.out.println(Messages.Task.deleted);
     this.taskModel.updateTasksNumbers();
   }

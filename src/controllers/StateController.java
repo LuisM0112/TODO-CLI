@@ -2,8 +2,8 @@ package controllers;
 
 import java.util.ArrayList;
 
-import Helpers.Printer;
-import Helpers.Messages;
+import helpers.Messages;
+import helpers.Printer;
 import models.StateModel;
 import models.definitions.State;
 
@@ -25,17 +25,26 @@ public class StateController {
   }
 
   public void create(String name) {
-    this.stateModel.create(name);
+    int resultStateId = this.stateModel.create(name);
+    if (resultStateId == 0) {
+      return;
+    }
     System.out.println(Messages.State.created);
   }
 
   public void update(String prevName, String newName) {
-    this.stateModel.update(prevName, newName);
+    int resultStateId = this.stateModel.update(prevName, newName);
+    if (resultStateId == 0) {
+      return;
+    }
     System.out.println(Messages.State.updated);
   }
 
   public void delete(String name) {
-    this.stateModel.delete(name);
+    int resultStateId = this.stateModel.delete(name);
+    if (resultStateId == 0) {
+      return;
+    }
     System.out.println(Messages.State.deleted);
   }
 

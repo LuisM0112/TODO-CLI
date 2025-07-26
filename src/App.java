@@ -4,8 +4,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import Helpers.Printer;
 import database.Database;
+import helpers.Printer;
 import cli.Flag;
 import controllers.StateController;
 import controllers.TaskController;

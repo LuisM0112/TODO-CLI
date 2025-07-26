@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import Helpers.Messages;
+import helpers.Messages;
 import models.definitions.State;
 import models.definitions.Task;
 
@@ -120,11 +120,11 @@ public class TaskModel {
     return task;
   }
 
-  public void create(String description, String stateName) {
+  public int create(String description, String stateName) {
     State state = stateModel.getByName(stateName);
     if (state == null) {
       System.err.println(Messages.State.notFound);
-      return;
+      return 0;
     }
 
     int taskNumber = getLastTaskNumber() + 1;
@@ -141,12 +141,13 @@ public class TaskModel {
     } catch (Exception e) {
       System.out.println("Create task error: " + e.getMessage());
     }
+    return taskNumber;
   }
 
-  public void update(int taskNumber, String newDescription) {
+  public int update(int taskNumber, String newDescription) {
     if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
-      return;
+      return 0;
     }
     String sqlUpdate = "UPDATE tasks SET description = ? WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
@@ -157,18 +158,19 @@ public class TaskModel {
     } catch (Exception e) {
       System.out.println("Update task error: " + e.getMessage());
     }
+    return taskNumber;
   }
 
-  public void changeState(int taskNumber, String newStateName) {
+  public int changeState(int taskNumber, String newStateName) {
     if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
-      return;
+      return 0;
     }
 
     State newState = stateModel.getByName(newStateName);
     if (newState == null) {
       System.err.println(Messages.State.notFound);
-      return;
+      return 0;
     }
     String sqlUpdate = "UPDATE tasks SET state_id = ? WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
@@ -179,12 +181,13 @@ public class TaskModel {
     } catch (Exception e) {
       System.out.println("Change task state error: " + e.getMessage());
     }
+    return taskNumber;
   }
 
-  public void delete(int taskNumber) {
+  public int delete(int taskNumber) {
     if (getByTaskNumber(taskNumber) == null) {
       System.err.println(Messages.Task.notFound);
-      return;
+      return 0;
     }
     String sqlDelete = "DELETE FROM tasks WHERE task_number = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
@@ -194,5 +197,6 @@ public class TaskModel {
     } catch (Exception e) {
       System.out.println("Delete task error: " + e.getMessage());
     }
+    return taskNumber;
   }
 }

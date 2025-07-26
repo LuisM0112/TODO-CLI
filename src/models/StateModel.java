@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import Helpers.Messages;
+import helpers.Messages;
 import models.definitions.State;
 
 public class StateModel {
@@ -72,10 +72,10 @@ public class StateModel {
     return state;
   }
 
-  public void create(String name) {
+  public int create(String name) {
     if (getByName(name) != null) {
       System.err.println(Messages.State.alreadyExists);
-      return;
+      return 0;
     }
     String sqlInsert = "INSERT INTO states(name) VALUES(?)";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlInsert)) {
@@ -85,12 +85,14 @@ public class StateModel {
     } catch (Exception e) {
       System.out.println("Create state error: " + e.getMessage());
     }
+    return getByName(name).id;
   }
 
-  public void update(String prevName, String newName) {
-    if (getByName(prevName) == null) {
+  public int update(String prevName, String newName) {
+    State state = getByName(prevName);
+    if (prevName == null) {
       System.err.println(Messages.State.notFound);
-      return;
+      return 0;
     }
     String sqlUpdate = "UPDATE states SET name = ? WHERE name = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlUpdate)) {
@@ -101,12 +103,14 @@ public class StateModel {
     } catch (Exception e) {
       System.out.println("Update state error: " + e.getMessage());
     }
+    return state.id;
   }
 
-  public void delete(String name) {
-    if (getByName(name) == null) {
+  public int delete(String name) {
+    State state = getByName(name);
+    if (state == null) {
       System.err.println(Messages.State.notFound);
-      return;
+      return 0;
     }
     String sqlDelete = "DELETE FROM states WHERE name = ?";
     try (PreparedStatement stmt = dbConnection.prepareStatement(sqlDelete)) {
@@ -116,5 +120,6 @@ public class StateModel {
     } catch (Exception e) {
       System.out.println("Delete state error: " + e.getMessage());
     }
+    return state.id;
   }
 }
