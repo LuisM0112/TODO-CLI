@@ -93,6 +93,10 @@ public class App {
         stateController.delete(a[0]);
       }));
 
+      flags.put("-o", new Flag(1, (a) -> {
+        Printer.outputFile(a[0], stateModel, taskModel);
+      }));
+
       for (int i = 0; i < args.length;) {
 
         String flagString = args[i];

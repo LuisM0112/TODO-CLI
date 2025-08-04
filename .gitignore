@@ -1,5 +1,6 @@
 # db file
 *.db
+*.csv
 
 /bin/
 /*.class
