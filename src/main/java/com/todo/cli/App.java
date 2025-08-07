@@ -17,9 +17,7 @@ import com.todo.cli.models.TaskModel;
 public class App {
   public static void main(String[] args) {
 
-    // args = new String[]{"--init", "-n", "Testing task", "default", "-l", "-lS"};
-
-    String dbUrl = "jdbc:sqlite:TODO.db";
+    String dbUrl = "jdbc:sqlite:" + System.getProperty("user.home") + "/TODO.db";
 
     Map<String, Flag> flags = new HashMap<>();
 
@@ -36,13 +34,15 @@ public class App {
       StateController stateController = new StateController(stateModel);
       TaskController taskController = new TaskController(taskModel);
 
+      Database.initialize(dbConnection);
+
       if (args.length < 1) {
         taskController.getAll();
         return;
       }
 
       flags.put("--init", new Flag(0, (ignored) -> {
-        Database.initialize(dbConnection);
+        Database.createDefaultState(dbConnection);
       }));
 
       flags.put("-h", new Flag(0, (ignored) -> {

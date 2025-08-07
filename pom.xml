@@ -42,39 +42,27 @@
 
             <!-- Plugin para empaquetar como JAR ejecutable -->
             <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
+                    <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                     <archive>
-                        <manifest>
-                            <mainClass>com.todo.cli.App</mainClass>
-                        </manifest>
+                    <manifest>
+                        <mainClass>com.todo.cli.App</mainClass>
+                    </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-            <plugin>
-            
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.6.0</version>
-            <configuration>
-                <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-                <archive>
-                <manifest>
-                    <mainClass>com.todo.cli.App</mainClass> <!-- Cambia según tu clase main -->
-                </manifest>
-                </archive>
-            </configuration>
-            <executions>
-                <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-                </execution>
-            </executions>
+                <executions>
+                    <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
