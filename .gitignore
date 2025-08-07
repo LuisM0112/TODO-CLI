@@ -1,8 +1,9 @@
-# db file
 *.db
 *.csv
 
 /bin/
+/target/
+/lib/
 /*.class
 
 .DS_Store
