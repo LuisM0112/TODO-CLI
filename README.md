@@ -2,7 +2,7 @@
 A simple TODO cli made with java
 
 ## Requirements
-- Java 9+ installed
+- Java 8+ installed
 
 ## 🧩 Download
 
